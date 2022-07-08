@@ -1,0 +1,60 @@
+---
+  - name: "update apt packages."
+    become: yes
+    apt:
+      update_cache: yes
+
+  - name: "upgrade packages"
+    become: yes
+    apt:
+      upgrade: yes
+
+  - name: remove dependencies that are no longer required
+    become: yes
+    apt:
+      autoremove: yes
+
+  - name: "install npm."
+    become: yes
+    apt:
+      name: npm
+      state: latest
+      update_cache: yes
+
+  - name: "install n"
+    become: yes
+    npm:
+      name: n
+      global: yes
+      production: yes     
+
+  - name: "install nodejs 16.15.1"
+    become: yes
+    shell: n 16.15.1
+
+  - name: "install pm2"
+    become: yes
+    npm:
+      name: pm2
+      global: yes
+      production: yes
+      state: present 
+
+  - name: extract zipped artifact into EC2 instance
+    become: yes
+    copy:
+      src: ~/project/artifact.tar.gz
+      dest: /home/ubuntu/artifact.tar.gz
+
+  - name: prepare binaries
+    become: true
+    shell: |
+      cd /home/ubuntu
+      tar xvzf artifact.tar.gz -C .         
+
+  - name: "Executing Node app with PM2"
+    become: true
+    shell: |
+      cd /home/ubuntu
+      pm2 stop default
+      pm2 start npm --name backend -- start
