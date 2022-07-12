@@ -204,7 +204,7 @@ jobs:
       - image: python:3.10.0-alpine
     steps:
       - checkout
-      - run: apk add --update openssh-client git
+      - run: apk add --update openssh-client curl tar git
       - add_ssh_keys:
           fingerprints: ["97:36:93:4e:1f:c0:6d:d7:ee:f8:24:85:d7:de:8a:25"]
       # attach workspace
@@ -239,6 +239,8 @@ jobs:
           paths:
             - project/backend/.env           
       - destroy-environment
+      - notify_slack_error
+      - notify_slack_pass
 
 #       # Here's where you will add some code to rollback on failure      
 
